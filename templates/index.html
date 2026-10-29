@@ -1,0 +1,189 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ settings.title }} — {{ settings.description }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+
+  <!-- Шапка -->
+  <header class="header" id="header">
+    <div class="container header__inner">
+      <a href="#" class="logo">
+        {% if settings.logo %}
+          <img src="{{ settings.logo.url }}" alt="{{ settings.title }}">
+        {% else %}
+          {{ settings.title }}
+        {% endif %}
+      </a>
+      <nav class="nav" id="nav">
+        <a href="#catalog" class="nav__link">Каталог</a>
+        <a href="#about" class="nav__link">О нас</a>
+        <a href="#credit" class="nav__link">Кредит</a>
+        <a href="#contacts" class="nav__link">Контакты</a>
+      </nav>
+      <a href="tel:+70000000000" class="header__phone">{{ settings.phone }}</a>
+      <button class="burger" id="burger" aria-label="Меню">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <section class="hero"{% if slide.image %} style="--hero-image: url('{{ slide.image.url }}')"{% endif %}>
+    <div class="container hero__inner">
+      <div class="hero__content">
+        <h1 class="hero__title">{% if slide %}{{ slide.title }}{% else %}{{ settings.title }}{% endif %}</h1>
+        <p class="hero__text">{% if slide %}{{ slide.description }}{% else %}{{ settings.description }}{% endif %}</p>
+        <div class="hero__buttons">
+          <a href="#catalog" class="btn btn--primary">Смотреть каталог</a>
+          <a href="#contacts" class="btn btn--outline">Записаться на тест-драйв</a>
+        </div>
+      </div>
+      <ul class="hero__stats">
+        <li><strong data-count="{% if slide %}{{ slide.sales }}{% else %}0{% endif %}">0</strong><span>машин продано</span></li>
+        <li><strong data-count="{% if slide %}{{ slide.age }}{% else %}0{% endif %}">0</strong><span>лет на рынке</span></li>
+        <li><strong data-count="{% if slide %}{{ slide.clients }}{% else %}0{% endif %}">0</strong><span>довольных клиентов</span></li>
+      </ul>
+    </div>
+  </section>
+  <!-- Каталог -->
+  <section class="section" id="catalog">
+    <div class="container">
+      <h2 class="section__title">Каталог автомобилей</h2>
+      <div class="filters">
+        <button class="filters__btn active" data-filter="all">Все</button>
+        <button class="filters__btn" data-filter="sedan">Седаны</button>
+        <button class="filters__btn" data-filter="suv">Кроссоверы</button>
+        <button class="filters__btn" data-filter="sport">Спорт</button>
+      </div>
+      <div class="cards" id="cards">
+        {% for car in cars %}
+          <article
+            class="card"
+            data-category="{{ car.category }}"
+            data-name="{{ car.name }}"
+            data-year="{{ car.year }}"
+            data-engine="{{ car.engine }}"
+            data-gearbox="{{ car.gearbox }}"
+            data-price="{{ car.price }}"
+            data-image="{% if car.image %}{{ car.image.url }}{% else %}{{ car.image_url }}{% endif %}"
+          >
+            {% if car.image %}
+              <img class="card__img" src="{{ car.image.url }}" alt="{{ car.name }}" loading="lazy">
+            {% elif car.image_url %}
+              <img class="card__img" src="{{ car.image_url }}" alt="{{ car.name }}" loading="lazy">
+            {% else %}
+              <div class="card__img card__img--empty" role="img" aria-label="Фото автомобиля не добавлено"></div>
+            {% endif %}
+            <div class="card__body">
+              <h3 class="card__title">{{ car.name }}</h3>
+              <p class="card__specs">{{ car.year }} · {{ car.engine }} · {{ car.gearbox }}</p>
+              <div class="card__footer">
+                <span class="card__price">{{ car.price }} ₽</span>
+                <button class="btn btn--primary" type="button" data-car-details>Подробнее</button>
+              </div>
+            </div>
+          </article>
+        {% empty %}
+          <p class="cards__empty">Автомобили скоро появятся в каталоге.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Преимущества -->
+  <section class="section section--gray" id="about">
+    <div class="container">
+      <h2 class="section__title">Почему выбирают нас</h2>
+      <div class="features">
+        {% for feature in features %}
+          <div class="feature">
+            <div class="feature__icon">{{ feature.icon }}</div>
+            <h3>{{ feature.title }}</h3>
+            <p>{{ feature.description }}</p>
+          </div>
+        {% empty %}
+          <p class="features__empty">Информация о преимуществах скоро появится.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Кредитный калькулятор -->
+  <section class="section" id="credit">
+    <div class="container credit">
+      <div class="credit__info">
+        <h2 class="section__title section__title--left">Кредитный калькулятор</h2>
+        <p>Рассчитайте примерный ежемесячный платёж. Точные условия уточнит менеджер.</p>
+      </div>
+      <form class="calc" id="calc">
+        <label class="calc__row">
+          <span>Стоимость авто: <b id="priceOut"></b></span>
+          <input type="range" id="price" min="500000" max="10000000" step="50000" value="3000000">
+        </label>
+        <label class="calc__row">
+          <span>Первый взнос: <b id="downOut"></b></span>
+          <input type="range" id="down" min="0" max="50" step="5" value="20">
+        </label>
+        <label class="calc__row">
+          <span>Срок: <b id="termOut"></b></span>
+          <input type="range" id="term" min="12" max="84" step="12" value="60">
+        </label>
+        <div class="calc__result">
+          Ежемесячный платёж
+          <strong id="monthly">—</strong>
+          <small>Ставка 4,9% годовых</small>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Контакты -->
+  <section class="section section--dark" id="contacts">
+    <div class="container contacts">
+      <div class="contacts__info">
+        <h2 class="section__title section__title--left">Свяжитесь с нами</h2>
+        <p>📍 {{ settings.address }}</p>
+        <p>📞 <a href="tel:{{ settings.phone }}">{{ settings.phone }}</a></p>
+        <p>✉️ <a href="mailto:{{ settings.email }}">{{ settings.email }}</a></p>
+        <p>🕘 Ежедневно с 9:00 до 21:00</p>
+      </div>
+      <form class="form" id="form" novalidate>
+        <input type="text" name="name" placeholder="Ваше имя" required>
+        <input type="tel" name="phone" placeholder="Телефон" required>
+        <select name="car" id="carSelect">
+          <option value="">Интересующий автомобиль</option>
+          {% for car in cars %}
+            <option value="{{ car.name }}">{{ car.name }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn--primary">Отправить заявку</button>
+        <p class="form__message" id="formMessage"></p>
+      </form>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">© <span id="year"></span> AutoLux. Все права защищены.</div>
+  </footer>
+
+  <!-- Модальное окно -->
+  <div class="modal" id="modal">
+    <div class="modal__box">
+      <button class="modal__close" id="modalClose" aria-label="Закрыть">×</button>
+      <img class="modal__img" id="modalImg" src="" alt="">
+      <h3 id="modalTitle"></h3>
+      <ul class="modal__specs" id="modalSpecs"></ul>
+      <div class="modal__price" id="modalPrice"></div>
+      <a href="#contacts" class="btn btn--primary" id="modalBtn">Оставить заявку</a>
+    </div>
+  </div>
+
+  <script src="{% static 'script.js' %}?v=2"></script>
+</body>
+</html>
