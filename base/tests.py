@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import Car, Feature, Settings, Slide
+from .models import Car, Contact, Feature, Settings, Slide
 
 
 class IndexPageTests(TestCase):
@@ -59,3 +59,32 @@ class IndexPageTests(TestCase):
         self.assertContains(response, 'Feature managed through the database.')
         self.assertContains(response, '<option value="Database Sedan">Database Sedan</option>', html=True)
         self.assertContains(response, 'Toyota Camry')
+
+    def test_contact_post_saves_submission_once_with_selected_car(self):
+        Car.objects.create(
+            name='Database Sedan',
+            category=Car.Category.SEDAN,
+            price=2500000,
+            year=2025,
+            engine='2.0 л, 150 л.с.',
+            gearbox='Автомат',
+        )
+
+        response = self.client.post(
+            '/',
+            {'name': 'Test User', 'phone': '+79991234567', 'car': 'Database Sedan'},
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Contact.objects.count(), 1)
+        contact = Contact.objects.get()
+        self.assertEqual(contact.name, 'Test User')
+        self.assertEqual(contact.phone, '+79991234567')
+        self.assertEqual(contact.car, 'Database Sedan')
+        self.assertContains(response, 'Спасибо, Test User!')
+
+    def test_contact_post_rejects_invalid_phone(self):
+        self.client.post('/', {'name': 'Test User', 'phone': '123', 'car': ''})
+
+        self.assertEqual(Contact.objects.count(), 0)

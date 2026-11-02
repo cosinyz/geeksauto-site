@@ -108,7 +108,6 @@ const form = document.getElementById('form');
 const formMessage = document.getElementById('formMessage');
 
 form.addEventListener('submit', (e) => {
-  e.preventDefault();
   const { name, phone } = form.elements;
   const phoneValid = phone.value.replace(/\D/g, '').length >= 10;
 
@@ -116,14 +115,10 @@ form.addEventListener('submit', (e) => {
   phone.classList.toggle('error', !phoneValid);
 
   if (!name.value.trim() || !phoneValid) {
+    e.preventDefault();
     formMessage.className = 'form__message error';
     formMessage.textContent = 'Пожалуйста, укажите имя и корректный телефон';
-    return;
   }
-
-  formMessage.className = 'form__message success';
-  formMessage.textContent = `Спасибо, ${name.value.trim()}! Мы перезвоним вам в ближайшее время.`;
-  form.reset();
 });
 
 // Анимация счётчиков

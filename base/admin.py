@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Car, Feature, Settings, Slide
+from .models import Car, Contact, Feature, Settings, Slide
 
 
 @admin.register(Car)
@@ -19,3 +19,9 @@ class FeatureAdmin(admin.ModelAdmin):
 
 admin.site.register(Settings)
 admin.site.register(Slide)
+
+
+@admin.register(Contact)
+class ContactAdmin(admin.ModelAdmin):
+    list_display = ('name', 'phone', 'car')
+    search_fields = ('name', 'phone', 'car')

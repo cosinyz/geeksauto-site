@@ -80,3 +80,16 @@ class Feature(models.Model):
         ordering = ('position', 'id')
         verbose_name = 'Преимущество'
         verbose_name_plural = 'Преимущества'
+
+
+class Contact(models.Model):
+    name = models.CharField(max_length=255, verbose_name='Имя')
+    phone = models.CharField(max_length=255, verbose_name='Телефонный номер')
+    car = models.CharField(max_length=255, blank=True, verbose_name='Автомобиль')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Обратная связь'
+        verbose_name_plural = 'Обратные связи'
